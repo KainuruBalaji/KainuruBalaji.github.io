@@ -4,26 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kainuru Balaji | Digital Portfolio</title>
-    
     <meta name="description" content="The digital portfolio of Kainuru Balaji, a Cybersecurity Enthusiast and Developer.">
     <meta name="author" content="Kainuru Balaji">
     <link rel="icon" type="image/png" href="favicon.png"> 
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
         :root {
-            --background-main: #EFF6FF; 
-            --surface-color: #FFFFFF;    
-            --text-primary: #111827;      
-            --text-secondary: #4B5563; 
-            --highlight-color: #2563EB;  
-            --border-light: rgba(37, 99, 235, 0.2);
+            --background-main: #EFF6FF;
+            --surface-color: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #4B5563;
+            --highlight-color: #2563EB;
+            --border-light: rgba(37, 99, 235, 0.15);
             --shadow-light: rgba(0, 0, 0, 0.07);
+            --glass: rgba(255,255,255,0.6);
+            --transition-fast: 180ms;
+            --transition-smooth: 400ms;
+        }
+
+        [data-theme="dark"] {
+            --background-main: #0B1220;
+            --surface-color: #071023;
+            --text-primary: #E6EEF8;
+            --text-secondary: #9FB3D6;
+            --highlight-color: #60A5FA;
+            --border-light: rgba(96, 165, 250, 0.12);
+            --shadow-light: rgba(0,0,0,0.5);
+            --glass: rgba(10, 20, 30, 0.5);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,6 +45,18 @@
             font-family: 'Inter', sans-serif;
             line-height: 1.7;
             overflow-x: hidden;
+        }
+
+        /* Scroll Progress Bar */
+        #scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: var(--highlight-color);
+            z-index: 1002;
+            transition: width var(--transition-fast) linear;
         }
 
         #particle-canvas {
@@ -71,125 +94,60 @@
 
         .animation-target {
             opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            transform: translateY(28px);
+            transition: opacity var(--transition-smooth) cubic-bezier(.2,.9,.2,1), transform var(--transition-smooth) cubic-bezier(.2,.9,.2,1);
+            will-change: opacity, transform;
         }
-        .animation-target.is-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
+        .animation-target.is-visible { opacity: 1; transform: translateY(0); }
         .stagger-animation .animation-target { transition-delay: calc(0.15s * var(--i)); }
 
-        .main-header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.85); 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border-light);
-        }
+        .main-header { position: fixed; top: 0; width: 100%; z-index: 1000; background: var(--glass); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid var(--border-light); }
         .main-nav { display: flex; justify-content: space-between; align-items: center; height: 70px; }
         .nav-brand { font-family: 'Inter', sans-serif; font-weight: 500; font-size: 1.2rem; color: var(--text-primary); }
         .nav-menu { list-style: none; display: flex; gap: 2rem; }
-        .nav-menu a { color: var(--text-secondary); font-weight: 500; transition: color 0.3s ease; position: relative; padding-bottom: 5px; }
-        .nav-menu a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--highlight-color); transition: width 0.3s ease; }
+        .nav-menu a { color: var(--text-secondary); font-weight: 500; transition: color var(--transition-fast); position: relative; padding-bottom: 5px; }
+        .nav-menu a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 2px; background: var(--highlight-color); transition: width var(--transition-fast); }
         .nav-menu a:hover, .nav-menu a.active { color: var(--text-primary); }
         .nav-menu a:hover::after, .nav-menu a.active::after { width: 100%; }
         .nav-toggle { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-primary); }
+        .theme-toggle { background: none; border: 1px solid transparent; padding: 6px 10px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background var(--transition-fast), border-color var(--transition-fast); }
+        .theme-toggle:focus { outline: 3px solid rgba(37,99,235,0.12); }
 
-        #hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0;
-        }
+        #hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0; }
         .hero-text { max-width: 800px; margin: 0 auto; }
-        #hero h1 { 
-            font-size: 4.1rem; 
-            line-height: 1.2; 
-            margin-bottom: 1rem;
-            min-height: 100px;
-        }
-        #hero .cursor {
-            display: inline-block;
-            background-color: var(--text-primary);
-            margin-left: 8px;
-            width: 4px;
-            animation: blink 1s infinite;
-        }
-        #hero .cursor.typing {
-            animation: none;
-        }
-        @keyframes blink {
-            50% { background-color: transparent; }
-        }
+        #hero h1 { font-size: 4.1rem; line-height: 1.2; margin-bottom: 1rem; min-height: 100px; }
+        #hero .cursor { display: inline-block; background-color: var(--text-primary); margin-left: 8px; width: 4px; animation: blink 1s infinite; height: 1.1em; vertical-align: middle; }
+        #hero .cursor.typing { animation: none; }
+        @keyframes blink { 50% { background-color: transparent; } }
         #hero .hero-subtitle { font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto; }
-        .cta-button {
-            display: inline-block;
-            background: var(--highlight-color);
-            color: #FFFFFF;
-            padding: 12px 28px;
-            border-radius: 8px;
-            font-weight: 700;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
+        .cta-button { display: inline-block; background: var(--highlight-color); color: #FFFFFF; padding: 12px 28px; border-radius: 8px; font-weight: 700; transition: transform var(--transition-fast), box-shadow var(--transition-fast); }
         .cta-button:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
-        .scroll-down-indicator {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 2rem;
-            color: var(--highlight-color);
-            animation: bounce 2s infinite;
-        }
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); }
-            40% { transform: translate(-50%, -15px); }
-            60% { transform: translate(-50%, -8px); }
-        }
-        
+        .scroll-down-indicator { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 2rem; color: var(--highlight-color); animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); } 40% { transform: translate(-50%, -15px); } 60% { transform: translate(-50%, -8px); } }
+
         .bio-layout { display: grid; grid-template-columns: 1fr 2fr; gap: 3rem; align-items: center; }
         .portrait-container img { width: 100%; border-radius: 12px; box-shadow: 0 10px 25px var(--shadow-light); }
         .bio-prose h3 { font-size: 1.8rem; margin-bottom: 1rem; }
 
         .skills-showcase { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
-        .competency-badge {
-            background: var(--surface-color);
-            padding: 2.2rem;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            box-shadow: 0 4px 10px var(--shadow-light);
-            transition: box-shadow 0.3s ease, transform 0.3s ease;
-        }
-        .competency-badge:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2); }
-        .competency-badge i { font-size: 2.5rem; color: var(--highlight-color); }
-        .competency-badge h4 { font-size: 1.1rem; font-family: 'Inter', sans-serif; font-weight: 500; }
+        .competency-badge { background: var(--surface-color); padding: 2.2rem; border-radius: 10px; display: flex; align-items: center; gap: 1rem; box-shadow: 0 4px 10px var(--shadow-light); transition: box-shadow var(--transition-fast), transform 120ms ease; transform-style: preserve-3d; perspective: 1000px; }
+        .competency-badge:hover { box-shadow: 0 15px 30px rgba(37, 99, 235, 0.12); }
+        .competency-badge i { font-size: 2.5rem; color: var(--highlight-color); transform: translateZ(20px); }
+        .competency-badge h4 { font-size: 1.1rem; font-family: 'Inter', sans-serif; font-weight: 500; transform: translateZ(20px); }
 
         .work-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; }
-        .work-item {
-            background: var(--surface-color);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px var(--shadow-light);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .work-item:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); }
+        .work-item { display: block; background: var(--surface-color); border-radius: 10px; overflow: hidden; box-shadow: 0 4px 15px var(--shadow-light); transition: transform 0.12s ease, box-shadow var(--transition-fast); text-decoration: none; color: inherit; position: relative; transform-style: preserve-3d; perspective: 1000px; }
+        .work-item::before { content: '\f09b'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; top: 20px; right: 20px; background: #fff; color: #000; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.5); transition: all var(--transition-fast); z-index: 10; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .work-item:hover::before { opacity: 1; transform: scale(1); }
+        .work-item:hover { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12); }
         .work-item img { width: 100%; height: 220px; object-fit: cover; transition: transform 0.4s ease; }
         .work-item:hover img { transform: scale(1.05); }
-        .work-info { padding: 1.5rem; }
-        .work-info h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .work-info { padding: 1.5rem; transform: translateZ(30px); background: var(--surface-color); }
+        .work-info h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-primary); }
+        .work-info p { font-size: 0.95rem; }
         .work-info .tech-tags { margin-top: 1rem; }
         .work-info .tag { display: inline-block; background: var(--background-main); color: var(--highlight-color); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; margin-right: 5px; font-weight: 500; }
-        
+
         .career-path { max-width: 800px; margin: 0 auto; position: relative; }
         .career-path::after { content: ''; position: absolute; width: 4px; background: #DDEBFF; top: 0; bottom: 0; left: 50%; margin-left: -2px; }
         .path-milestone { padding: 10px 40px; position: relative; width: 50%; }
@@ -208,87 +166,74 @@
         .credential-card i { margin-right: 10px; }
 
         #resume { text-align: center; }
-        .download-button {
-            display: inline-block;
-            padding: 14px 32px;
-            border: 2px solid var(--highlight-color);
-            color: var(--highlight-color);
-            border-radius: 8px;
-            font-weight: 700;
-            transition: all 0.3s ease;
-        }
+        .download-button { display: inline-block; padding: 14px 32px; border: 2px solid var(--highlight-color); color: var(--highlight-color); border-radius: 8px; font-weight: 700; transition: all var(--transition-fast); }
         .download-button:hover { background: var(--highlight-color); color: #FFFFFF; transform: translateY(-3px); }
-        
+
         #contact { text-align: center; }
         .contact-area p { max-width: 600px; margin: 0 auto 2rem auto; }
-        .social-media-links a { font-size: 1.8rem; color: var(--text-secondary); margin: 0 1rem; transition: color 0.3s ease, transform 0.3s ease; display: inline-block; }
+        .social-media-links a { font-size: 1.8rem; color: var(--text-secondary); margin: 0 1rem; transition: color var(--transition-fast), transform var(--transition-fast); display: inline-block; position: relative; }
         .social-media-links a:hover { color: var(--highlight-color); transform: translateY(-5px); }
+        .social-media-links a::after { content: attr(aria-label); position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; background: var(--text-primary); color: #fff; padding: 4px 8px; border-radius: 4px; opacity: 0; pointer-events: none; transition: opacity var(--transition-fast); white-space: nowrap; }
+        .social-media-links a:hover::after { opacity: 1; }
 
         .main-footer { text-align: center; padding: 2rem 0; margin-top: 4rem; border-top: 1px solid #DDEBFF; font-size: 0.9rem; color: var(--text-secondary); }
-        
+
         @media (max-width: 768px) {
             html { scroll-padding-top: 70px; }
             h2.section-heading { font-size: 2.2rem; margin-bottom: 3rem; }
             section { padding: 4rem 0; }
-
             .nav-toggle { display: block; z-index: 1001; }
-            .nav-menu {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                width: 70%;
-                height: 100vh;
-                background: var(--surface-color);
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                gap: 2.5rem;
-                transition: right 0.5s cubic-bezier(0.77, 0, 0.175, 1);
-                box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-            }
+            .nav-menu { position: fixed; top: 0; right: -100%; width: 70%; height: 100vh; background: var(--surface-color); flex-direction: column; justify-content: center; align-items: center; gap: 2.5rem; transition: right 0.5s cubic-bezier(0.77, 0, 0.175, 1); box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
             .nav-menu.nav-active { right: 0; }
             .nav-menu a { font-size: 1.2rem; }
-
             #hero { height: 90vh; }
             #hero h1 { font-size: 2.8rem; min-height: 80px; }
             #hero .hero-subtitle { font-size: 1.1rem; }
-
             .bio-layout { grid-template-columns: 1fr; gap: 2rem; }
-
             .career-path::after { left: 20px; margin-left: 0; }
             .path-milestone, .path-milestone:nth-child(even) { width: 100%; left: 0; padding-left: 60px; padding-right: 10px; }
             .path-milestone::after, .path-milestone:nth-child(even)::after { left: 10px; }
         }
+
+        /* Back to top button */
+        #back-to-top { position: fixed; right: 20px; bottom: 26px; background: var(--highlight-color); color: #fff; width: 44px; height: 44px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37,99,235,0.18); border: none; cursor: pointer; transform: translateY(10px); opacity: 0; visibility: hidden; transition: opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast); z-index: 1003; }
+        #back-to-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        /* Respect reduced motion preference */
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
     </style>
 </head>
 <body>
+    <div id="scroll-progress" aria-hidden="true"></div>
     <canvas id="particle-canvas"></canvas>
 
     <header class="main-header">
         <nav class="page-wrapper main-nav">
             <a href="#hero" class="nav-brand">Kainuru Balaji</a>
-            <ul class="nav-menu">
+            <ul class="nav-menu" role="menu">
                 <li><a href="#about" class="nav-link">About</a></li>
                 <li><a href="#projects" class="nav-link">Projects</a></li>
                 <li><a href="#skills" class="nav-link">Skills</a></li>
                 <li><a href="#experience" class="nav-link">Experience</a></li>
                 <li><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
-            <button class="nav-toggle" aria-label="Toggle navigation">
-                <i class="fas fa-bars"></i>
-            </button>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme"> <i class="fas fa-moon" aria-hidden="true"></i> </button>
+                <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                    <i class="fas fa-bars" aria-hidden="true"></i>
+                </button>
+            </div>
         </nav>
     </header>
 
     <main>
-
         <section id="hero">
             <div class="hero-text animation-target">
                 <h1>
-                    <span id="typing-text"></span><span class="cursor">&nbsp;</span>
+                    <span id="typing-text"></span><span class="cursor" aria-hidden="true">&nbsp;</span>
                 </h1>
                 <p class="hero-subtitle">Cybersecurity Enthusiast & Aspiring Red Teamer | Developer Building Secure Digital Systems</p>
-                <a href="#projects" class="cta-button">View My Work</a>
+                <a href="#projects" class="cta-button">View My Projects</a>
             </div>
             <a href="#about" class="scroll-down-indicator" aria-label="Scroll down">
                 <i class="fas fa-chevron-down"></i>
@@ -309,273 +254,197 @@
         </section>
 
         <section id="projects" class="page-wrapper">
-            <h2 class="section-heading animation-target">My Recent Work</h2>
+            <h2 class="section-heading animation-target">Featured Projects</h2>
             <div class="work-gallery stagger-animation">
-                <div class="work-item animation-target" style="--i: 1;">
-                    <img src="./Keylogger.png" alt="Remote Keylogger Project Thumbnail">
+                <a href="https://github.com/KainuruBalaji/IDS--with-RL-Project" target="_blank" rel="noopener" class="work-item js-tilt animation-target" style="--i: 1;">
+                    <img src="./ids.jpg" alt="IDS Integrated RL Project" onerror="this.src='https://via.placeholder.com/600x400/2563EB/FFFFFF?text=IDS+Integrated+RL'">
                     <div class="work-info">
-                        <h3>Remote Keylogger</h3>
-                        <p>A remote keystroke-capture tool designed for research and red-team exercises, featuring encrypted data transmission and secure access controls.</p>
-                        <div class="tech-tags">
-                            <span class="tag">Python</span><span class="tag">Cryptography</span><span class="tag">Networking</span>
-                        </div>
+                        <h3>IDS Integrated RL</h3>
+                        <p>A Network Intrusion Detection System utilizing Reinforcement Learning to dynamically adapt and identify malicious network traffic patterns with high accuracy.</p>
+                        <div class="tech-tags"><span class="tag">Reinforcement Learning</span><span class="tag">Python</span><span class="tag">Network Security</span></div>
                     </div>
-                </div>
-                <div class="work-item animation-target" style="--i: 2;">
-                    <img src="./Phish.jpg" alt="GoPhish Simulation Project Thumbnail">
+                </a>
+
+                <a href="https://github.com/KainuruBalaji/Interactive-Honeypot-using-MQTT-Protocol-in-IOT-Environment-using-Reinforcement-Learning." target="_blank" rel="noopener" class="work-item js-tilt animation-target" style="--i: 2;">
+                     <img src="./honeypot.png" alt="Interactive Honeypot Project" onerror="this.src='https://via.placeholder.com/600x400/2563EB/FFFFFF?text=IoT+Honeypot'">
                     <div class="work-info">
-                        <h3>GoPhish Simulation</h3>
-                        <p>A simulation platform that creates, launches, and analyzes realistic phishing campaigns for red-team training and security awareness programs.</p>
-                        <div class="tech-tags">
-                            <span class="tag">HTML & CSS</span><span class="tag">GoPhish</span>
-                        </div>
+                        <h3>Interactive IoT Honeypot</h3>
+                        <p>An intelligent Honeypot for IoT environments utilizing MQTT protocol and Reinforcement Learning to simulate vulnerable devices and analyze attacker behavior.</p>
+                        <div class="tech-tags"><span class="tag">IoT</span><span class="tag">MQTT</span><span class="tag">Reinforcement Learning</span></div>
                     </div>
-                </div>
+                </a>
+
+                <a href="https://github.com/Balajikainuru1432005/YOUR_MALWARE_PROJECT" target="_blank" rel="noopener" class="work-item js-tilt animation-target" style="--i: 3;">
+                     <img src="./malware.jpg" alt="Android Malware Detection Project" onerror="this.src='https://via.placeholder.com/600x400/2563EB/FFFFFF?text=Malware+Detection'">
+                    <div class="work-info">
+                        <h3>Android Malware Detection</h3>
+                        <p>A machine learning-based system designed to analyze Android application packages (APKs) and detect potential malware signatures and anomalies.</p>
+                        <div class="tech-tags"><span class="tag">Machine Learning</span><span class="tag">Android</span><span class="tag">Python</span></div>
+                    </div>
+                </a>
             </div>
         </section>
         
         <section id="skills" class="page-wrapper">
             <h2 class="section-heading animation-target">Core Competencies</h2>
             <div class="skills-showcase stagger-animation">
-                <div class="competency-badge animation-target" style="--i: 1;"><i class="fab fa-js-square"></i><div><h4>JavaScript</h4></div></div>
-                <div class="competency-badge animation-target" style="--i: 2;"><i class="fab fa-python"></i><div><h4>Python</h4></div></div>
-                <div class="competency-badge animation-target" style="--i: 3;"><i class="fas fa-database"></i><div><h4>SQL & NoSQL</h4></div></div>
-                <div class="competency-badge animation-target" style="--i: 4;"><i class="fab fa-git-alt"></i><div><h4>Version Control (Git)</h4></div></div>
+                <div class="competency-badge js-tilt animation-target" style="--i: 1;"><i class="fab fa-js-square"></i><div><h4>JavaScript</h4></div></div>
+                <div class="competency-badge js-tilt animation-target" style="--i: 2;"><i class="fab fa-python"></i><div><h4>Python</h4></div></div>
+                <div class="competency-badge js-tilt animation-target" style="--i: 3;"><i class="fas fa-database"></i><div><h4>SQL & NoSQL</h4></div></div>
+                <div class="competency-badge js-tilt animation-target" style="--i: 4;"><i class="fab fa-git-alt"></i><div><h4>Version Control</h4></div></div>
+                <div class="competency-badge js-tilt animation-target" style="--i: 5;"><i class="fas fa-brain"></i><div><h4>Machine Learning</h4></div></div>
+                <div class="competency-badge js-tilt animation-target" style="--i: 6;"><i class="fas fa-network-wired"></i><div><h4>Network Security</h4></div></div>
             </div>
         </section>
 
         <section id="experience" class="page-wrapper">
             <h2 class="section-heading animation-target">Career Journey</h2>
             <div class="career-path stagger-animation">
-                <div class="path-milestone animation-target" style="--i: 1;">
-                    <div class="milestone-details">
-                        <h3>Cybersecurity Domain Lead</h3>
-                        <p>IOTA Club, IIIT Sri City</p>
-                        <span class="date">2024 - Present</span>
-                        <ul>
-                            <li>Leading cybersecurity initiatives and mentoring peers in penetration testing and red teaming.</li>
-                            <li>Organized hands-on workshops and awareness sessions on ethical hacking and system security.</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="path-milestone animation-target" style="--i: 2;">
-                    <div class="milestone-details">
-                        <h3>Key Projects</h3>
-                        <p>Self-initiated & Academic</p>
-                        <span class="date">2023 - Present</span>
-                        <ul>
-                            <li>Developed a Remote Keylogger using Python sockets with encrypted communication.</li>
-                            <li>Built phishing simulations using GoPhish to analyze user security awareness.</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="path-milestone animation-target" style="--i: 3;">
-                    <div class="milestone-details">
-                        <h3>Web Development Projects</h3>
-                        <p>Portfolio & Team Projects</p>
-                        <span class="date">2023 - Present</span>
-                        <ul>
-                            <li>Created a seller verification system with multi-step registration and progress tracking.</li>
-                            <li>Developed an Urban Company Clone with service categories and dark-themed UI.</li>
-                        </ul>
-                    </div>
-                </div>
+                <div class="path-milestone animation-target" style="--i: 1;"><div class="milestone-details"><h3>Cybersecurity Domain Lead</h3><p>IOTA Club, IIIT Sri City</p><span class="date">2024 - Present</span><ul><li>Leading cybersecurity initiatives and mentoring peers in penetration testing and red teaming.</li><li>Organized hands-on workshops and awareness sessions on ethical hacking and system security.</li></ul></div></div>
+                <div class="path-milestone animation-target" style="--i: 2;"><div class="milestone-details"><h3>Research & Development</h3><p>Academic & Independent</p><span class="date">2023 - Present</span><ul><li>Developed AI-driven security solutions including IDS and Adaptive Honeypots.</li><li>Researched malware behavior in Android environments using ML classifiers.</li></ul></div></div>
+                <div class="path-milestone animation-target" style="--i: 3;"><div class="milestone-details"><h3>Web Development Projects</h3><p>Portfolio & Team Projects</p><span class="date">2023 - Present</span><ul><li>Created a seller verification system with multi-step registration and progress tracking.</li><li>Developed an Urban Company Clone with service categories and dark-themed UI.</li></ul></div></div>
             </div>
         </section>
         
         <section id="education" class="page-wrapper">
             <h2 class="section-heading animation-target">Education & Achievements</h2>
             <div class="credentials-layout stagger-animation">
-                <div class="credential-card animation-target" style="--i: 1;">
-                    <h3><i class="fas fa-graduation-cap"></i>Bachelor of Technology in CSE</h3>
-                    <p>Indian Institute of Information Technology, Sri City | 2023 – 2027</p>
-                    <p>Currently pursuing my B.Tech with a focus on cybersecurity, penetration testing, and secure software development.</p>
-                </div>
-                <div class="credential-card animation-target" style="--i: 2;">
-                    <h3><i class="fas fa-trophy"></i>Achievements & Leadership</h3>
-                    <p><strong>Cybersecurity Domain Lead, IOTA Club</strong> – Leading initiatives, workshops, and projects in ethical hacking and red teaming.</p>
-                    <p><strong>Hackathons & Collaborations</strong> – Actively participated in university hackathons and team projects focused on web development and security.</p>
-                </div>
+                <div class="credential-card animation-target" style="--i: 1;"><h3><i class="fas fa-graduation-cap"></i>Bachelor of Technology in CSE</h3><p>Indian Institute of Information Technology, Sri City | 2023 – 2027</p><p>Currently pursuing my B.Tech with a focus on cybersecurity, penetration testing, and secure software development.</p></div>
+                <div class="credential-card animation-target" style="--i: 2;"><h3><i class="fas fa-trophy"></i>Achievements & Leadership</h3><p><strong>Cybersecurity Domain Lead, IOTA Club</strong> – Leading initiatives, workshops, and projects in ethical hacking and red teaming.</p><p><strong>Hackathons & Collaborations</strong> – Actively participated in university hackathons and team projects focused on web development and security.</p></div>
             </div>
         </section>
 
         <section id="resume" class="page-wrapper">
-            <div class="animation-target">
-                <h2 class="section-heading">My Resume</h2>
-                <p style="text-align: center; max-width: 600px; margin: -2rem auto 2rem auto;">
-                    For a more detailed look at my work history, skills, and projects, please download my resume.
-                </p>
-                <a href="./RESUME_MY.pdf" class="download-button" download>Download Resume</a>
-            </div>
+            <div class="animation-target"><h2 class="section-heading">My Resume</h2><p style="text-align: center; max-width: 600px; margin: -2rem auto 2rem auto;">For a more detailed look at my work history, skills, and projects, please download my resume.</p><a href="./RESUME_MY.pdf" class="download-button" download>Download Resume</a></div>
         </section>
 
         <section id="contact" class="page-wrapper">
-            <div class="contact-area animation-target">
-                <h2 class="section-heading">Get In Touch</h2>
-                <p>I'm currently open to new opportunities and collaborations. Feel free to reach out via email or connect with me on social media.</p>
-                <div class="social-media-links">
-                    <a href="mailto:Kainurubalaji@gmail.com?subject=Portfolio%20Inquiry" aria-label="Email"><i class="fas fa-envelope"></i></a>
-                    <a href="https://www.linkedin.com/in/kainuru-balaji-b57b15267" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="https://github.com/Balajikainuru1432005" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                </div>
-            </div>
+            <div class="contact-area animation-target"><h2 class="section-heading">Get In Touch</h2><p>I'm currently open to new opportunities and collaborations. Feel free to reach out via email or connect with me on social media.</p><div class="social-media-links"><a href="mailto:Kainurubalaji@gmail.com?subject=Portfolio%20Inquiry" aria-label="Email"><i class="fas fa-envelope"></i></a><a href="https://www.linkedin.com/in/kainuru-balaji-b57b15267" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a><a href="https://github.com/KainuruBalaji" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a><a href="https://leetcode.com/u/YOUR_USERNAME" target="_blank" rel="noopener" aria-label="LeetCode"><i class="fas fa-code"></i></a></div></div>
         </section>
     </main>
 
-    <footer class="main-footer">
-        <div class="page-wrapper">
-            <p>&copy; 2025 Kainuru Balaji. Crafted with care.</p>
-        </div>
-    </footer>
+    <footer class="main-footer"><div class="page-wrapper"><p>&copy; 2025 Kainuru Balaji. Crafted with care.</p></div></footer>
+
+    <button id="back-to-top" aria-label="Back to top" title="Back to top"><i class="fas fa-chevron-up" aria-hidden="true"></i></button>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            // Typing effect
             const typingText = document.getElementById('typing-text');
             const cursor = document.querySelector('.cursor');
-            const textToType = "Hi, I'm Kainuru Balaji";
-            let charIndex = 0;
+            const words = ["Hi, I'm Kainuru Balaji", "Cybersecurity Enthusiast", "Red Team Aspiring", "Secure Systems Developer"];
+            let wordIndex = 0, charIndex = 0, isDeleting = false;
 
-            function type() {
-                if (charIndex < textToType.length) {
-                    typingText.textContent += textToType.charAt(charIndex);
-                    charIndex++;
-                    setTimeout(type, 120);
+            function typeLoop() {
+                if (!typingText) return;
+                const current = words[wordIndex];
+                if (isDeleting) {
+                    typingText.textContent = current.slice(0, charIndex - 1);
+                    charIndex--;
                 } else {
-                    cursor.classList.remove('typing');
+                    typingText.textContent = current.slice(0, charIndex + 1);
+                    charIndex++;
                 }
+
+                let delay = isDeleting ? 40 : 90;
+                if (!isDeleting && charIndex === current.length) { isDeleting = true; delay = 2000; }
+                if (isDeleting && charIndex === 0) { isDeleting = false; wordIndex = (wordIndex + 1) % words.length; delay = 600; }
+                if (!prefersReducedMotion) setTimeout(typeLoop, delay);
             }
-            cursor.classList.add('typing');
-            type();
-            
-            const animationObserver = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                    }
+            if (!prefersReducedMotion) typeLoop();
+
+            // Scroll progress (raf optimized)
+            const progressEl = document.getElementById('scroll-progress');
+            let ticking = false;
+            function updateProgress() {
+                const scrollTotal = document.documentElement.scrollHeight - document.documentElement.clientHeight || 1;
+                const scrollCurrent = document.documentElement.scrollTop || document.body.scrollTop;
+                const pct = (scrollCurrent / scrollTotal) * 100;
+                progressEl.style.width = pct + '%';
+                ticking = false;
+            }
+            window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(updateProgress); } });
+
+            // Tilt effect with performance guard
+            const tiltElements = document.querySelectorAll('.js-tilt');
+            if (!prefersReducedMotion) {
+                tiltElements.forEach(card => {
+                    card.addEventListener('mousemove', (e) => {
+                        const rect = card.getBoundingClientRect();
+                        const x = (e.clientX - rect.left) / rect.width - 0.5;
+                        const y = (e.clientY - rect.top) / rect.height - 0.5;
+                        const rx = (y * -12).toFixed(2);
+                        const ry = (x * 12).toFixed(2);
+                        card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) scale3d(1.02,1.02,1.02)`;
+                    });
+                    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
                 });
-            }, { threshold: 0.1 });
+            }
 
-            const elementsToAnimate = document.querySelectorAll('.animation-target');
-            elementsToAnimate.forEach((el) => {
-                animationObserver.observe(el);
-            });
+            // Intersection observer for animations
+            const animationObserver = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('is-visible'); }); }, { threshold: 0.12 });
+            document.querySelectorAll('.animation-target').forEach(el => animationObserver.observe(el));
 
+            // Nav highlighting via intersection observer
             const navLinks = document.querySelectorAll('.nav-link');
             const sections = document.querySelectorAll('section[id]');
             const navObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        const id = entry.target.getAttribute('id');
-                        navLinks.forEach(link => {
-                            link.classList.remove('active');
-                            if (link.getAttribute('href') === `#${id}`) {
-                                link.classList.add('active');
-                            }
-                        });
+                        const id = entry.target.id;
+                        navLinks.forEach(link => link.classList.toggle('active', link.getAttribute('href') === `#${id}`));
                     }
                 });
-            }, { rootMargin: '-40% 0px -60% 0px' });
+            }, { rootMargin: '-40% 0px -55% 0px' });
+            sections.forEach(s => navObserver.observe(s));
 
-            sections.forEach(section => {
-                navObserver.observe(section);
-            });
-
+            // Mobile nav toggle with aria
             const navToggle = document.querySelector('.nav-toggle');
             const navMenu = document.querySelector('.nav-menu');
-            navToggle.addEventListener('click', () => {
-                navMenu.classList.toggle('nav-active');
+            navToggle && navToggle.addEventListener('click', () => {
+                const expanded = navMenu.classList.toggle('nav-active');
+                navToggle.setAttribute('aria-expanded', expanded);
                 navToggle.querySelector('i').classList.toggle('fa-bars');
                 navToggle.querySelector('i').classList.toggle('fa-times');
             });
-            
-            navLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    if (navMenu.classList.contains('nav-active')) {
-                        navMenu.classList.remove('nav-active');
-                        navToggle.querySelector('i').classList.add('fa-bars');
-                        navToggle.querySelector('i').classList.remove('fa-times');
-                    }
-                });
+            navLinks.forEach(link => link.addEventListener('click', () => { if (navMenu.classList.contains('nav-active')) { navMenu.classList.remove('nav-active'); navToggle.setAttribute('aria-expanded', 'false'); navToggle.querySelector('i').classList.add('fa-bars'); navToggle.querySelector('i').classList.remove('fa-times'); } }));
+            document.addEventListener('keyup', (e) => { if (e.key === 'Escape' && navMenu.classList.contains('nav-active')) { navMenu.classList.remove('nav-active'); navToggle.setAttribute('aria-expanded', 'false'); } });
+
+            // Theme toggle (persisted)
+            const themeToggle = document.getElementById('theme-toggle');
+            const root = document.documentElement;
+            const saved = localStorage.getItem('theme');
+            if (saved) root.setAttribute('data-theme', saved);
+            function updateThemeIcon() { const icon = themeToggle.querySelector('i'); if (root.getAttribute('data-theme') === 'dark') { icon.className = 'fas fa-sun'; } else { icon.className = 'fas fa-moon'; } }
+            updateThemeIcon();
+            themeToggle && themeToggle.addEventListener('click', () => {
+                const active = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                root.setAttribute('data-theme', active === 'dark' ? 'dark' : '');
+                localStorage.setItem('theme', active === 'dark' ? 'dark' : 'light');
+                updateThemeIcon();
             });
 
+            // Back to top button
+            const backToTop = document.getElementById('back-to-top');
+            function checkBackToTop() { if (window.scrollY > window.innerHeight) backToTop.classList.add('show'); else backToTop.classList.remove('show'); }
+            window.addEventListener('scroll', () => { requestAnimationFrame(checkBackToTop); });
+            backToTop.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); backToTop.blur(); });
+
+            // Particle background (pausable for reduced motion)
             const canvas = document.getElementById('particle-canvas');
-            const ctx = canvas.getContext('2d');
-            let particlesArray;
-
-            function setCanvasSize() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                    this.size = 1.5;
-                    this.speedX = (Math.random() * 1 - 0.5) * 0.5;
-                    this.speedY = (Math.random() * 1 - 0.5) * 0.5;
-                    this.color = 'rgba(37, 99, 235, 0.5)';
-                }
-                update() {
-                    if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
-                    if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-                }
-                draw() {
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-
-            function initParticles() {
-                particlesArray = [];
-                let numberOfParticles = (canvas.height * canvas.width) / 9000;
-                for (let i = 0; i < numberOfParticles; i++) {
-                    particlesArray.push(new Particle());
-                }
-            }
-
-            function connectParticles() {
-                let opacityValue = 1;
-                for (let a = 0; a < particlesArray.length; a++) {
-                    for (let b = a; b < particlesArray.length; b++) {
-                        let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) +
-                                     ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
-                        if (distance < (canvas.width / 7) * (canvas.height / 7)) {
-                            opacityValue = 1 - (distance / 20000);
-                            ctx.strokeStyle = `rgba(37, 99, 235, ${opacityValue * 0.3})`;
-                            ctx.lineWidth = 1;
-                            ctx.beginPath();
-                            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-                            ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
-                            ctx.stroke();
-                        }
-                    }
-                }
-            }
-
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                for (let i = 0; i < particlesArray.length; i++) {
-                    particlesArray[i].update();
-                    particlesArray[i].draw();
-                }
-                connectParticles();
-                requestAnimationFrame(animate);
-            }
-
-            window.addEventListener('resize', () => {
-                setCanvasSize();
-                initParticles();
-            });
-
-            setCanvasSize();
-            initParticles();
-            animate();
+            const ctx = canvas && canvas.getContext ? canvas.getContext('2d') : null;
+            let particlesArray = [];
+            function setCanvasSize() { if (!canvas) return; canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            class Particle { constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = 1.5; this.speedX = (Math.random() * 1 - 0.5) * 0.4; this.speedY = (Math.random() * 1 - 0.5) * 0.4; this.color = 'rgba(37, 99, 235, 0.45)'; } update() { if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX; if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY; this.x += this.speedX; this.y += this.speedY; } draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); } }
+            function initParticles() { if (!canvas || prefersReducedMotion) return; particlesArray = []; let numberOfParticles = Math.max(10, Math.round((canvas.height * canvas.width) / 14000)); for (let i = 0; i < numberOfParticles; i++) particlesArray.push(new Particle()); }
+            function connectParticles() { for (let a = 0; a < particlesArray.length; a++) for (let b = a + 1; b < particlesArray.length; b++) { const dx = particlesArray[a].x - particlesArray[b].x; const dy = particlesArray[a].y - particlesArray[b].y; const dist = dx * dx + dy * dy; const max = 25000; if (dist < max) { const o = 1 - dist / max; ctx.strokeStyle = `rgba(37,99,235,${o * 0.25})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(particlesArray[a].x, particlesArray[a].y); ctx.lineTo(particlesArray[b].x, particlesArray[b].y); ctx.stroke(); } } }
+            let particleAnimationId;
+            function animateParticles() { if (!ctx || prefersReducedMotion) return; ctx.clearRect(0, 0, canvas.width, canvas.height); for (let p of particlesArray) { p.update(); p.draw(); } connectParticles(); particleAnimationId = requestAnimationFrame(animateParticles); }
+            window.addEventListener('resize', () => { setCanvasSize(); initParticles(); });
+            setCanvasSize(); initParticles(); if (!prefersReducedMotion) animateParticles();
         });
-    </script> 
+    </script>
 </body>
 </html>
